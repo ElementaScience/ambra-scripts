@@ -21,6 +21,7 @@
 -->
 <!DOCTYPE xsl:stylesheet [
     <!ENTITY nlmpub  "http://dtd.nlm.nih.gov/publishing/">
+    <!ENTITY jatpub  "http://jats.nlm.nih.gov/publishing/">
 ]>
 
 <xsl:stylesheet version="2.0"
@@ -48,6 +49,9 @@
   <xsl:output name="nlm-3.0"
       doctype-public="-//NLM//DTD Journal Publishing DTD v3.0 20080202//EN"
       doctype-system="&nlmpub;3.0/journalpublishing3.dtd"/>
+  <xsl:output name="nlm-1.0"
+              doctype-public="-//NLM//DTD JATS (Z39.96) Journal Publishing DTD v1.0 20120330//EN"
+              doctype-system="&jatpub;1.0/JATS-journalpublishing1.dtd"/>
 
   <!-- transform and write out the article -->
   <xsl:template match="/">
@@ -91,6 +95,8 @@
         (: doi-uri normalization: 'doi:/DOI' -> 'info:doi/DOI' :)
         if (starts-with($href, 'doi:')) then
           concat($doiPrefix, '/', substring($href, 5))
+        else if (starts-with($href, 'info:doi/10.12952/elementa')) then
+          concat('info:doi/10.12952/journal.', substring($href, 19))
         else
           $href
       else if ($href = $manifest/manifest/articleBundle/*/representation/@entry) then

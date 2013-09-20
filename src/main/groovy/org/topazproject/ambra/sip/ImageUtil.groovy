@@ -105,7 +105,8 @@ public class ImageUtil {
     File tempXmp = File.createTempFile(file.getName(), ".xmp")
     tempXmp.deleteOnExit()
     tempXmp.withOutputStream{ it << new ByteArrayInputStream(xmp.getBytes()) }
-    antExec(imMogrify, "-profile XMP:${tempXmp.canonicalPath} ${file.canonicalPath}")
+    def locArgs = "-profile XMP:${tempXmp.canonicalPath} ${file.canonicalPath}"
+    antExec(imMogrify, locArgs)
     tempXmp.delete()
   }
 
@@ -152,20 +153,25 @@ public class ImageUtil {
   }
 
   private Properties antExec(exe, args) throws ImageProcessingException {
+
+      if (verbose) {
+          println "exe:          ${exe} ${args}"
+      }
+
     def ant = new AntBuilder()
     ant.exec(outputproperty:"cmdOut",
              errorproperty: "cmdErr",
              resultproperty:"cmdExit",
              failonerror: "true",
+             searchpath: "true",
              executable: exe) {
                arg(line: args)
              }
 
     if (verbose) {
-      println "exe:          ${exe} ${args}"
-      println "return code:  ${ant.project.properties.cmdExit}"
-      println "stderr:       ${ant.project.properties.cmdErr}"
-      println "stdout:       ${ant.project.properties.cmdOut}"
+        println "return code:  ${ant.project.properties.cmdExit}"
+        println "stderr:       ${ant.project.properties.cmdErr}"
+        println "stdout:       ${ant.project.properties.cmdOut}"
     }
 
     if (ant.project.properties.cmdExit != '0')

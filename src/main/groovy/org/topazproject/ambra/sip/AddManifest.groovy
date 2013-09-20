@@ -71,7 +71,7 @@ public class AddManifest {
       // get a list of secondary objects
       def objs = entries*.minus(~/\.[^.]+$/).unique().minus(base)
       def strkImgs = objs.grep(~/[A-Za-z]+\.[0-9]+\.strk$/)
-      def figs = objs.grep(~/[A-Za-z]+\.[0-9]+\.g[^.]+$/)
+      def figs = objs.grep(~/[A-Za-z]+\.[0-9]+\.f[^.]+$/)
       def tbls = objs.grep(~/[A-Za-z]+\.[0-9]+\.t[^.]+$/)
       def strkImage = ""
 
@@ -134,7 +134,8 @@ public class AddManifest {
 
   private String toUri(String name) throws IOException {
     name = name.substring(name.lastIndexOf('/') + 1);   // strip directories
-    return 'info:doi/10.1371/journal.' + URLEncoder.encode(name, 'UTF-8');
+//    name = name.replace('-','.');
+    return 'info:doi/10.12952/journal.' + URLEncoder.encode(name, 'UTF-8');
   }
 
   /**
