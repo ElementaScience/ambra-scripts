@@ -19,11 +19,9 @@
  */
 
 package org.topazproject.ambra.sip
-
 import org.apache.commons.configuration.Configuration
-import org.topazproject.ambra.util.ToolHelper
-import java.util.regex.Matcher
 
+import java.util.regex.Matcher
 /**
  * Create scaled down versions of all images and add them as additional representations
  * to the SIP.
@@ -74,7 +72,7 @@ public class ImageUtil {
       "\n" +
       " <rdf:Description rdf:about=''\n" +
       "  xmlns:photoshop='http://ns.adobe.com/photoshop/1.0/'>\n" +
-      "  <photoshop:Source>@@ARTICLE_DOI@@</photoshop:Source>\n" +
+      "  <photoshop:Source>@@ARTICLE_DOI@@F</photoshop:Source>\n" +
       " </rdf:Description>\n" +
       "</rdf:RDF>\n" +
       "</x:xmpmeta>\n" +
@@ -128,7 +126,9 @@ public class ImageUtil {
       throws ImageProcessingException {
     def newFile = new File(tmpDir, outName)
     if (verbose)
-      println "Creating ${newFile}"
+    {
+        println "\tCreating ${newFile}"
+    }
 
     if (quality < 0 || quality > 100)
       quality = 100;
@@ -155,7 +155,7 @@ public class ImageUtil {
   private Properties antExec(exe, args) throws ImageProcessingException {
 
       if (verbose) {
-          println "exe:          ${exe} ${args}"
+          println "\texe:          ${exe} ${args}"
       }
 
     def ant = new AntBuilder()
@@ -169,14 +169,14 @@ public class ImageUtil {
              }
 
     if (verbose) {
-        println "return code:  ${ant.project.properties.cmdExit}"
-        println "stderr:       ${ant.project.properties.cmdErr}"
-        println "stdout:       ${ant.project.properties.cmdOut}"
+        println "\treturn code:  ${ant.project.properties.cmdExit}"
+        println "\tstderr:       ${ant.project.properties.cmdErr}"
+        println "\tstdout:       ${ant.project.properties.cmdOut}"
     }
 
     if (ant.project.properties.cmdExit != '0')
       throw new ImageProcessingException(
-                  "Error running '${exe} ${args}', exit-status=${ant.project.properties.cmdExit}")
+                  "\tError running '${exe} ${args}', exit-status=${ant.project.properties.cmdExit}")
 
     return ant.project.properties
   }

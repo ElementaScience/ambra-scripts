@@ -51,35 +51,45 @@ if (opt.h || otherArgs.size() != 1) {
   return
 }
 
+println("Loading configuration...")
 def config = ToolHelper.loadConfiguration(opt.c)
 def inp = otherArgs[0]
 def out = opt.o ?: inp
-println("SIP for " + inp)
+println("Processing input file: " + inp)
 
 try {
   boolean hasManif = new ArchiveFile(inp).entries().iterator()*.name.contains(SipUtil.MANIFEST)
   if (opt.f || !hasManif) {
     new AddManifest().addManifest(inp, out)
-    println "  manifest ${hasManif ? 'replaced' : 'added'}"
+//    println "  manifest ${hasManif ? 'replaced' : 'added'}"
     inp = out
   } else {
-    println "  manifest already present"
+//    println "  manifest already present"
   }
 
-  new FixArticle().fixLinks(inp, out)
-  println "  article links fixed"
+    // Update the links in the article
 
-  new ProcessImages(config, opt.v).processImages(out, null)
-  println "  images processed"
+    println("Starting to fix up links in the article... ")
+    new FixArticle().fixLinks(inp, out)
+    println "Article links fixed successfully.\n"
 
-  new ValidateSIP().validate(out)
-  println "  validation: No problems found"
-  println "done"
+    // Process the images to create the correctly sized versions for display
 
-  System.exit(0)
+    println("Starting to process images... ")
+    new ProcessImages(config, opt.v).processImages(out, null)
+    println "Images processed successfully.\n"
+
+    // Validate
+
+    println("Starting to validate the article... ")
+    new ValidateSIP().validate(out)
+    println "Validation complete: No problems found.\n"
+
+    println "Processing complete."
+    System.exit(0)
 } catch (Exception e) {
-  println("  error: " + e)
-  if (opt.v)
+    println("Error detected during processing: " + e.getMessage() + "\n")
     e.printStackTrace()
+
   System.exit(1)
 }

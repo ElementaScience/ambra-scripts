@@ -78,7 +78,7 @@ public class ProcessImages {
    */
   public void processImages(String articleFile, String newName) {
     if (verbose) {
-      println('Processing file: ' + articleFile)
+      println('\tProcessing file: ' + articleFile)
     }
 
     SipUtil.updateZip(articleFile, newName) { articleZip, newZip ->
@@ -102,7 +102,7 @@ public class ProcessImages {
           File f = File.createTempFile('tmp_', entry.name)
           f.withOutputStream{ it << articleZip.getInputStream(entry) }
           if (verbose) {
-            println 'Created temp image file: ' + f.getCanonicalPath()
+            println '\tCreated temp image file: ' + f.getCanonicalPath()
           }
           //process the image (add metadata, etc.)
           newImageFiles[entry.name] = processImage(newZip, entry.name, f, art, manif)
@@ -151,7 +151,7 @@ public class ProcessImages {
     }
   }
 
-  /**
+/**
    * check if a zip entry is an image
    * @param entryName the name of the zip entry
    * @return true if the entry is an image, false if not
@@ -194,7 +194,7 @@ public class ProcessImages {
       imgUtil.addMetadata(file, pubDate, description, doi, publisher, title, articleDoi, copyright)
 
       if(verbose) {
-        println "added metadata to ${name}"
+        println "\tAdded metadata to ${name}"
       }
     }
     if (name.toLowerCase().endsWith('.tif')) {
@@ -204,7 +204,7 @@ public class ProcessImages {
       List<File> newFiles = makeResizedImages(name, file, imgSet, reps)
       for(f in newFiles){
         if(verbose){
-          println "adding ${f.name} to new zip"
+          println "\tAdding ${f.name} to new zip"
         }
         newZip.writeEntry(f.name, f.length(), f.newInputStream())
         newImages << f.name
@@ -279,9 +279,9 @@ public class ProcessImages {
                       find{ it.'@name' == name }
 
       if (verbose) {
-        println "article-type: ${artType}"
-        println "img-set-name: ${name}"
-        println "img-set:      ${is ? 'found' : 'not-found, using hardcoded defaults'}"
+        println "\tarticle-type: ${artType}"
+        println "\timg-set-name: ${name}"
+        println "\timg-set:      ${is ? 'found' : 'not-found, using hardcoded defaults'}"
       }
 
       return is
@@ -304,7 +304,7 @@ public class ProcessImages {
         return type
       }
     }
-    println "Unknown copyright type: '${copyright}'"
+    println "\tUnknown copyright type: '${copyright}'"
     return "";
   }
 
@@ -319,7 +319,13 @@ public class ProcessImages {
        return [name:'striking-image', context:null]
 
     if (!linkInArticle)
-       throw new IOException("xlink:href=\"${uri}\" not found in the article")
+    {
+        if (verbose)
+        {
+            println("ERROR: xlink:href=\"${uri}\" not found in the article");
+        }
+        throw new IOException("Unused image [" + entryName + "] included.");
+    }
 
     def ref = linkInArticle.'..'
     ref = ref.name() == 'supplementary-material' ? ref : ref.'..'

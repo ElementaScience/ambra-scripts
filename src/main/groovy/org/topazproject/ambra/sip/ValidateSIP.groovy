@@ -74,11 +74,42 @@ public class ValidateSIP {
     validateLinks(zf, manif, art, ve)
     validateEntries(zf, manif, art, ve)
 
+      validateThatLinksHaveFiles(art, zf)
+
     if (ve.getErrors().size() > 0)
       throw ve
   }
 
-  /**
+    private void validateThatLinksHaveFiles(def art, ArchiveFile archiveFile)
+    {
+        def a = art.'**'*.'@xlink:href'.findAll {it.text()}
+        for (aa in a)
+        {
+            def index = aa.toString().lastIndexOf("/")
+            def ref = aa.toString().substring(index+1)
+            index = ref.indexOf(".")
+            ref = ref.substring(index+1)
+            println("\tValidating Reference: " + ref);
+
+            if (!inManifest(ref, archiveFile))
+            {
+                throw new RuntimeException("Article reference [" + ref +"] refers to a non-existent file.")
+            }
+        }
+    }
+
+    boolean inManifest(String ref, def articleZip) {
+        for (entry in articleZip.entries()) {
+            if (entry.name.contains(ref)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
    * Check that article is defined and present.
    */
   private void validateManifest(ArchiveFile zf, def manif, ValidationException ve) throws IOException {

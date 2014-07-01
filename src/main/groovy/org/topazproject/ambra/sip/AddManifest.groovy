@@ -75,7 +75,12 @@ public class AddManifest {
       def tbls = objs.grep(~/[A-Za-z]+\.[0-9]+\.t[^.]+$/)
       def strkImage = ""
 
-      println "Adding striking image. " + strkImgs
+        if (strkImage.length() > 0)
+        {
+            println "Adding striking image. " + strkImgs
+
+        }
+
       if (strkImgs.size() > 0) {
          strkImage = strkImgs[strkImgs.size() - 1]
       } else if (figs.size() > 0) {
@@ -83,7 +88,11 @@ public class AddManifest {
       } else if (tbls.size() > 0) {
          strkImage = tbls[tbls.size() - 1]
       }
-      println "Striking image " + strkImage
+
+        if (strkImage.length() > 0)
+        {
+            println "Striking image " + strkImage
+        }
 
       // write the manifest
       zout.putNextEntry(SipUtil.MANIFEST)
